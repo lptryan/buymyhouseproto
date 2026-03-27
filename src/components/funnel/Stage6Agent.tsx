@@ -9,7 +9,7 @@ import AddressChip from './AddressChip';
 interface Stage6Props {
   address: string;
   agent: Agent | null;
-  onConfirm: () => void;
+  onConfirm: () => Promise<void>;
 }
 
 const SPRING: [number, number, number, number] = [0.34, 1.56, 0.64, 1];
@@ -50,9 +50,13 @@ export default function Stage6Agent({ address, agent, onConfirm }: Stage6Props) 
   const [loading, setLoading] = useState(false);
   const displayAgent = agent || DEFAULT_AGENT;
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     setLoading(true);
-    onConfirm();
+    try {
+      await onConfirm();
+    } finally {
+      setLoading(false);
+    }
   };
 
   const initials = displayAgent.name
