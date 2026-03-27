@@ -2,6 +2,11 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useFunnel } from '@/hooks/useFunnel';
 import Stage1Hero from './Stage1Hero';
 import Stage3Evaluation from './Stage3Evaluation';
+import Stage4Qualification from './Stage4Qualification';
+import Stage5Identity from './Stage5Identity';
+import Stage6Agent from './Stage6Agent';
+import Stage7Confirmation from './Stage7Confirmation';
+import type { Motivation, Timeline, Condition } from '@/lib/types';
 
 const stageVariants = {
   enter: { opacity: 0, x: 40 },
@@ -20,7 +25,6 @@ export default function FunnelContainer() {
 
   const renderStage = () => {
     switch (currentStage) {
-      // Stages 1 & 2 are on the same page (Stage 2 is below-fold scroll reveal)
       case 1:
       case 2:
         return (
@@ -35,10 +39,10 @@ export default function FunnelContainer() {
             <Stage1Hero
               onSubmitAddress={(address, city, state, zip) => {
                 funnel.setAddress(address, city, state, zip);
-                funnel.goToStage(2); // Stay on same page, Stage 2 reveals below
+                funnel.goToStage(2);
               }}
               onContinueToAssessment={() => {
-                funnel.goToStage(3); // CTA in Stage 2 advances to Stage 3
+                funnel.goToStage(3);
               }}
             />
           </motion.div>
@@ -59,33 +63,84 @@ export default function FunnelContainer() {
             />
           </motion.div>
         );
-      default:
+      case 4:
         return (
           <motion.div
-            key="placeholder"
+            key="stage4"
             variants={stageVariants}
             initial="enter"
             animate="center"
             exit="exit"
             transition={stageTransition}
-            className="flex items-center justify-center min-h-screen"
           >
-            <div
-              className="bg-card rounded-card p-8 text-center max-w-md"
-              style={{
-                boxShadow: '0 1px 3px rgba(27,43,75,0.06), 0 8px 24px rgba(27,43,75,0.08), 0 24px 48px rgba(27,43,75,0.06)',
+            <Stage4Qualification
+              address={funnel.state.address}
+              onComplete={(motivation: Motivation, timeline: Timeline, condition: Condition) => {
+                funnel.setQualification(motivation, timeline, condition);
+                funnel.goToStage(5);
               }}
-            >
-              <div className="h-[3px] accent-bar -mx-8 -mt-8 mb-6 rounded-t-card" />
-              <h2 className="text-[18px] font-bold tracking-[-0.3px] mb-2" style={{ color: '#1B2B4B' }}>
-                Stage {currentStage}
-              </h2>
-              <p className="text-[13px]" style={{ color: '#4A5E72' }}>
-                Coming soon — use the iteration prompts to build this stage.
-              </p>
-            </div>
+              onBack={() => funnel.goToStage(3)}
+            />
           </motion.div>
         );
+      case 5:
+        return (
+          <motion.div
+            key="stage5"
+            variants={stageVariants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            transition={stageTransition}
+          >
+            <Stage5Identity
+              address={funnel.state.address}
+              onComplete={(name, email, phone) => {
+                funnel.setIdentity(name, email, phone);
+                // For now, advance to Stage 6 with no agent fetch (DB tables needed)
+                funnel.goToStage(6);
+              }}
+            />
+          </motion.div>
+        );
+      case 6:
+        return (
+          <motion.div
+            key="stage6"
+            variants={stageVariants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            transition={stageTransition}
+          >
+            <Stage6Agent
+              address={funnel.state.address}
+              agent={funnel.state.agent}
+              onConfirm={() => {
+                // For now, advance to Stage 7 (lead write + emails need DB)
+                funnel.goToStage(7);
+              }}
+            />
+          </motion.div>
+        );
+      case 7:
+        return (
+          <motion.div
+            key="stage7"
+            variants={stageVariants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            transition={stageTransition}
+          >
+            <Stage7Confirmation
+              address={funnel.state.address}
+              agent={funnel.state.agent}
+            />
+          </motion.div>
+        );
+      default:
+        return null;
     }
   };
 
