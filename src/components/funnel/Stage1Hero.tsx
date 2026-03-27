@@ -71,7 +71,7 @@ export default function Stage1Hero({ onSubmitAddress, onContinueToAssessment }: 
               Home in 24 Hours
             </h1>
             <p className="text-[15px] text-text-body mb-8 leading-relaxed">
-              Join 12,400+ homeowners who got clarity on their home's value — no obligation, no agent fees, no surprises.
+              Join 12,400+ homeowners who got clarity on their home's value — no obligation, no agent fees, no surprises..
             </p>
 
             {/* Address form */}
