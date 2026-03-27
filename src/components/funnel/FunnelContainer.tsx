@@ -11,7 +11,7 @@ const stageVariants = {
 
 const stageTransition = {
   duration: 0.4,
-  ease: [0.34, 1.3, 0.64, 1],
+  ease: [0.34, 1.3, 0.64, 1] as [number, number, number, number],
 };
 
 export default function FunnelContainer() {

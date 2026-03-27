@@ -7,8 +7,8 @@ interface Stage3Props {
   onComplete: () => void;
 }
 
-const springEntry = [0.34, 1.56, 0.64, 1];
-const smoothExit = [0.4, 0, 0.2, 1];
+const springEntry: [number, number, number, number] = [0.34, 1.56, 0.64, 1];
+const smoothExit: [number, number, number, number] = [0.4, 0, 0.2, 1];
 
 interface AnalysisStep {
   label: string;
