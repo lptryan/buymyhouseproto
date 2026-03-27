@@ -98,4 +98,5 @@ export interface FunnelState {
   email: string;
   phone: string;
   agentId: string | null;
+  agent: Agent | null;
 }

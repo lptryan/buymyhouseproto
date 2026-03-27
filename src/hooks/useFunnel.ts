@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import type { FunnelState, Motivation, Timeline, Condition } from '@/lib/types';
+import type { FunnelState, Motivation, Timeline, Condition, Agent } from '@/lib/types';
 
 const initialState: FunnelState = {
   currentStage: 1,
@@ -14,6 +14,7 @@ const initialState: FunnelState = {
   email: '',
   phone: '',
   agentId: null,
+  agent: null,
 };
 
 export function useFunnel() {
@@ -43,8 +44,12 @@ export function useFunnel() {
     setState(prev => ({ ...prev, name, email, phone }));
   }, []);
 
-  const setAgent = useCallback((agentId: string) => {
-    setState(prev => ({ ...prev, agentId }));
+  const setAgent = useCallback((agentId: string, agent?: Agent) => {
+    setState(prev => ({ ...prev, agentId, agent: agent || prev.agent }));
+  }, []);
+
+  const setQualification = useCallback((motivation: Motivation, timeline: Timeline, condition: Condition) => {
+    setState(prev => ({ ...prev, motivation, timeline, condition }));
   }, []);
 
   return {
@@ -56,5 +61,6 @@ export function useFunnel() {
     setCondition,
     setIdentity,
     setAgent,
+    setQualification,
   };
 }
