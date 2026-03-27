@@ -1,15 +1,16 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MapPin, DollarSign, Plane, Home, ArrowDownRight, ArrowUpRight, RefreshCw, Search, Clock, Calendar, Timer, Hourglass, Compass, Sparkles, ThumbsUp, Wrench, AlertTriangle, HardHat, ArrowLeft } from 'lucide-react';
+import { DollarSign, Plane, Home, ArrowDownRight, ArrowUpRight, RefreshCw, Search, Clock, Calendar, Timer, Hourglass, Compass, Sparkles, ThumbsUp, Wrench, AlertTriangle, HardHat, ArrowLeft } from 'lucide-react';
 import type { Motivation, Timeline, Condition } from '@/lib/types';
+import CardShell from './CardShell';
+import CardHeader from './CardHeader';
+import AddressChip from './AddressChip';
 
 interface Stage4Props {
   address: string;
   onComplete: (motivation: Motivation, timeline: Timeline, condition: Condition) => void;
   onBack: () => void;
 }
-
-const SPRING: [number, number, number, number] = [0.34, 1.56, 0.64, 1];
 
 const MOTIVATION_OPTIONS: { value: Motivation; label: string; sub: string; icon: typeof DollarSign }[] = [
   { value: 'financial_pressure', label: 'Financial Pressure', sub: 'Need to free up equity or cash', icon: DollarSign },
@@ -61,11 +62,7 @@ export default function Stage4Qualification({ address, onComplete, onBack }: Sta
         setDirection(1);
         setCurrentQ(currentQ + 1);
       } else {
-        onComplete(
-          newAnswers[0] as Motivation,
-          newAnswers[1] as Timeline,
-          newAnswers[2] as Condition,
-        );
+        onComplete(newAnswers[0] as Motivation, newAnswers[1] as Timeline, newAnswers[2] as Condition);
       }
     }, 350);
   };
@@ -83,52 +80,29 @@ export default function Stage4Qualification({ address, onComplete, onBack }: Sta
 
   return (
     <div className="min-h-screen bg-background flex flex-col items-center justify-center px-5 py-12">
-      <motion.div
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: SPRING, delay: 0.1 }}
-        className="w-full max-w-[560px] bg-card rounded-card overflow-hidden shadow-card"
-      >
-        {/* Accent bar */}
-        <div className="h-[3px] accent-bar" />
+      <CardShell>
+        <CardHeader
+          subtitle="LPT Holdings — Qualification"
+          rightContent={
+            <div className="flex items-center gap-2">
+              <span className="text-[11px] font-medium text-text-body">Question {currentQ + 1} of 3</span>
+              <div className="flex gap-1.5">
+                {[0, 1, 2].map(i => (
+                  <div
+                    key={i}
+                    className="w-[6px] h-[6px] rounded-full transition-all duration-300"
+                    style={{
+                      background: i <= currentQ ? 'hsl(var(--navy))' : 'hsl(var(--border-input))',
+                      transform: i === currentQ ? 'scale(1.3)' : 'scale(1)',
+                    }}
+                  />
+                ))}
+              </div>
+            </div>
+          }
+        />
 
-        {/* Header */}
-        <div className="px-7 pt-6 pb-5 flex items-center justify-between" style={{ borderBottom: '1px solid hsl(var(--border-light))' }}>
-          <div>
-            <div className="text-[13px] font-extrabold tracking-[-0.3px] text-foreground">
-              Buy<span className="text-gold">My</span>House
-            </div>
-            <div className="text-[11px] text-muted-foreground mt-0.5 tracking-[0.3px]">
-              LPT Holdings — Qualification
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-[11px] font-medium text-text-body">Question {currentQ + 1} of 3</span>
-            <div className="flex gap-1.5">
-              {[0, 1, 2].map(i => (
-                <div
-                  key={i}
-                  className="w-[6px] h-[6px] rounded-full transition-all duration-300"
-                  style={{
-                    background: i <= currentQ ? 'hsl(var(--navy))' : 'hsl(var(--border-input))',
-                    transform: i === currentQ ? 'scale(1.3)' : 'scale(1)',
-                  }}
-                />
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Address Row */}
-        <div className="px-7 py-[18px] flex items-center gap-3 bg-surface-2" style={{ borderBottom: '1px solid hsl(var(--border-light))' }}>
-          <div className="w-[34px] h-[34px] rounded-icon-bg bg-primary flex items-center justify-center shrink-0">
-            <MapPin className="w-4 h-4 text-gold" />
-          </div>
-          <div>
-            <div className="text-[10px] uppercase tracking-[1.5px] text-muted-foreground mb-0.5">Property</div>
-            <div className="text-[13px] font-semibold text-foreground tracking-[-0.2px]">{address || '123 Main St, Austin TX 78701'}</div>
-          </div>
-        </div>
+        <AddressChip address={address} />
 
         {/* Question content */}
         <div className="px-7 pt-7 pb-6">
@@ -162,10 +136,7 @@ export default function Stage4Qualification({ address, onComplete, onBack }: Sta
                         borderLeft: isSelected ? '4px solid hsl(var(--gold))' : '1.5px solid hsl(var(--border-input))',
                       }}
                     >
-                      <div
-                        className="w-10 h-10 rounded-icon-bg flex items-center justify-center shrink-0"
-                        style={{ background: 'hsl(var(--navy))' }}
-                      >
+                      <div className="w-10 h-10 rounded-icon-bg flex items-center justify-center shrink-0 bg-navy">
                         <Icon className="w-5 h-5 text-gold" strokeWidth={1.8} />
                       </div>
                       <div>
@@ -190,7 +161,7 @@ export default function Stage4Qualification({ address, onComplete, onBack }: Sta
             Back
           </button>
         </div>
-      </motion.div>
+      </CardShell>
     </div>
   );
 }
