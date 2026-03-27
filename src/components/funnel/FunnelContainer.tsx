@@ -1,5 +1,7 @@
+import { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useFunnel } from '@/hooks/useFunnel';
+import { fetchAgentByZip, submitLead } from '@/lib/queries';
 import Stage1Hero from './Stage1Hero';
 import Stage3Evaluation from './Stage3Evaluation';
 import Stage4Qualification from './Stage4Qualification';
@@ -7,6 +9,7 @@ import Stage5Identity from './Stage5Identity';
 import Stage6Agent from './Stage6Agent';
 import Stage7Confirmation from './Stage7Confirmation';
 import type { Motivation, Timeline, Condition } from '@/lib/types';
+import { toast } from 'sonner';
 
 const stageVariants = {
   enter: { opacity: 0, x: 40 },
@@ -22,6 +25,7 @@ const stageTransition = {
 export default function FunnelContainer() {
   const funnel = useFunnel();
   const { currentStage } = funnel.state;
+  const [submitting, setSubmitting] = useState(false);
 
   const renderStage = () => {
     switch (currentStage) {
@@ -41,9 +45,7 @@ export default function FunnelContainer() {
                 funnel.setAddress(address, city, state, zip);
                 funnel.goToStage(2);
               }}
-              onContinueToAssessment={() => {
-                funnel.goToStage(3);
-              }}
+              onContinueToAssessment={() => funnel.goToStage(3)}
             />
           </motion.div>
         );
@@ -95,9 +97,14 @@ export default function FunnelContainer() {
           >
             <Stage5Identity
               address={funnel.state.address}
-              onComplete={(name, email, phone) => {
+              onComplete={async (name, email, phone) => {
                 funnel.setIdentity(name, email, phone);
-                // For now, advance to Stage 6 with no agent fetch (DB tables needed)
+                // Fetch matching agent
+                const zip = funnel.state.zip || funnel.state.address.match(/\d{5}/)?.[0] || '';
+                const agent = await fetchAgentByZip(zip);
+                if (agent) {
+                  funnel.setAgent(agent.id, agent);
+                }
                 funnel.goToStage(6);
               }}
             />
@@ -116,9 +123,29 @@ export default function FunnelContainer() {
             <Stage6Agent
               address={funnel.state.address}
               agent={funnel.state.agent}
-              onConfirm={() => {
-                // For now, advance to Stage 7 (lead write + emails need DB)
-                funnel.goToStage(7);
+              onConfirm={async () => {
+                if (submitting) return;
+                setSubmitting(true);
+                try {
+                  await submitLead({
+                    address: funnel.state.address,
+                    city: funnel.state.city,
+                    state: funnel.state.state,
+                    zip: funnel.state.zip,
+                    motivation: funnel.state.motivation,
+                    timeline: funnel.state.timeline,
+                    condition: funnel.state.condition,
+                    name: funnel.state.name,
+                    email: funnel.state.email,
+                    phone: funnel.state.phone,
+                    agentId: funnel.state.agentId,
+                  });
+                  funnel.goToStage(7);
+                } catch (err) {
+                  console.error('Lead submission failed:', err);
+                  toast.error('Something went wrong. Please try again.');
+                  setSubmitting(false);
+                }
               }}
             />
           </motion.div>
