@@ -20,10 +20,12 @@ export default function FunnelContainer() {
 
   const renderStage = () => {
     switch (currentStage) {
+      // Stages 1 & 2 are on the same page (Stage 2 is below-fold scroll reveal)
       case 1:
+      case 2:
         return (
           <motion.div
-            key="stage1"
+            key="stage1-2"
             variants={stageVariants}
             initial="enter"
             animate="center"
@@ -33,7 +35,10 @@ export default function FunnelContainer() {
             <Stage1Hero
               onSubmitAddress={(address, city, state, zip) => {
                 funnel.setAddress(address, city, state, zip);
-                funnel.goToStage(3);
+                funnel.goToStage(2); // Stay on same page, Stage 2 reveals below
+              }}
+              onContinueToAssessment={() => {
+                funnel.goToStage(3); // CTA in Stage 2 advances to Stage 3
               }}
             />
           </motion.div>
@@ -65,9 +70,19 @@ export default function FunnelContainer() {
             transition={stageTransition}
             className="flex items-center justify-center min-h-screen"
           >
-            <div className="bg-card rounded-card shadow-card p-8 text-center max-w-md">
-              <h2 className="text-xl font-bold text-foreground mb-2">Stage {currentStage}</h2>
-              <p className="text-text-body text-sm">Coming soon — use the iteration prompts to build this stage.</p>
+            <div
+              className="bg-card rounded-card p-8 text-center max-w-md"
+              style={{
+                boxShadow: '0 1px 3px rgba(27,43,75,0.06), 0 8px 24px rgba(27,43,75,0.08), 0 24px 48px rgba(27,43,75,0.06)',
+              }}
+            >
+              <div className="h-[3px] accent-bar -mx-8 -mt-8 mb-6 rounded-t-card" />
+              <h2 className="text-[18px] font-bold tracking-[-0.3px] mb-2" style={{ color: '#1B2B4B' }}>
+                Stage {currentStage}
+              </h2>
+              <p className="text-[13px]" style={{ color: '#4A5E72' }}>
+                Coming soon — use the iteration prompts to build this stage.
+              </p>
             </div>
           </motion.div>
         );
