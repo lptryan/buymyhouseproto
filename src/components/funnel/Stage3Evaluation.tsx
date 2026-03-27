@@ -1,16 +1,16 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MapPin, Check, ArrowRight } from 'lucide-react';
+import { Check, ArrowRight } from 'lucide-react';
+import CardShell from './CardShell';
+import AddressChip from './AddressChip';
 
 interface Stage3Props {
   address: string;
   onComplete: () => void;
 }
 
-/* ── Easing curves (exact from reference) ── */
+/* ── Easing curves ── */
 const SPRING: [number, number, number, number] = [0.34, 1.56, 0.64, 1];
-const SMOOTH: [number, number, number, number] = [0.4, 0, 0.2, 1];
-const GENTLE_SPRING: [number, number, number, number] = [0.34, 1.3, 0.64, 1];
 
 /* ── Step config ── */
 interface StepConfig {
@@ -19,7 +19,6 @@ interface StepConfig {
 }
 
 function getSteps(address: string): StepConfig[] {
-  // Extract zip and city from address for dynamic labels
   const parts = address.split(',').map(s => s.trim());
   const city = parts[1] || 'Scottsdale';
   const zipMatch = address.match(/\d{5}/);
@@ -40,7 +39,7 @@ function getSteps(address: string): StepConfig[] {
   ];
 }
 
-/* ── Timing (exact from reference JS) ── */
+/* ── Timing ── */
 const TIMELINE = [
   { show: 700, activate: 900, complete: 2000, masterAt: [{ t: 900, v: 5 }, { t: 1600, v: 22 }], subDelays: [200, 500, 820] },
   { show: 2100, activate: 2250, complete: 3200, masterAt: [{ t: 2250, v: 38 }, { t: 3200, v: 50 }] },
@@ -55,8 +54,8 @@ export default function Stage3Evaluation({ address, onComplete }: Stage3Props) {
   const steps = getSteps(address);
   const [stepStates, setStepStates] = useState<StepState[]>(Array(5).fill('pending'));
   const [masterPct, setMasterPct] = useState(0);
-  const [visibleSources, setVisibleSources] = useState<Record<number, number>>({}); // stepIdx → count visible
-  const [confirmedSources, setConfirmedSources] = useState<Record<string, boolean>>({}); // "stepIdx-sourceIdx" → true
+  const [visibleSources, setVisibleSources] = useState<Record<number, number>>({});
+  const [confirmedSources, setConfirmedSources] = useState<Record<string, boolean>>({});
   const [showResult, setShowResult] = useState(false);
   const [showAction, setShowAction] = useState(false);
   const [countdown, setCountdown] = useState(3);
@@ -77,16 +76,11 @@ export default function Stage3Evaluation({ address, onComplete }: Stage3Props) {
     });
   }, []);
 
-  // Run sequence on mount
   useEffect(() => {
-    // Show master progress
-    T(600, () => {}); // master is always visible via state
-
     TIMELINE.forEach((tl, i) => {
       T(tl.show, () => setStep(i, 'visible'));
       T(tl.activate, () => {
         setStep(i, 'active');
-        // Sub-sources
         if (tl.subDelays && steps[i].subSources) {
           steps[i].subSources!.forEach((_, si) => {
             T(tl.activate + tl.subDelays![si], () => {
@@ -102,14 +96,11 @@ export default function Stage3Evaluation({ address, onComplete }: Stage3Props) {
       tl.masterAt.forEach(({ t, v }) => T(t, () => setMasterPct(v)));
     });
 
-    // Result reveal
     T(7300, () => setShowResult(true));
-    // Stats stagger
     T(7700, () => setStatShown(prev => { const n = [...prev]; n[0] = true; return n; }));
     T(7900, () => setStatShown(prev => { const n = [...prev]; n[1] = true; return n; }));
     T(8100, () => setStatShown(prev => { const n = [...prev]; n[2] = true; return n; }));
     T(8300, () => setStatShown(prev => { const n = [...prev]; n[3] = true; return n; }));
-    // Action row
     T(8600, () => setShowAction(true));
 
     return () => {
@@ -118,7 +109,6 @@ export default function Stage3Evaluation({ address, onComplete }: Stage3Props) {
     };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Countdown
   useEffect(() => {
     if (!showAction) return;
     setCountdown(3);
@@ -144,24 +134,13 @@ export default function Stage3Evaluation({ address, onComplete }: Stage3Props) {
 
   return (
     <div className="min-h-screen bg-background flex flex-col items-center justify-center px-5 py-12">
-      {/* Card */}
-      <motion.div
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: SPRING, delay: 0.1 }}
-        className="w-full max-w-[560px] bg-card rounded-card overflow-hidden"
-        style={{ boxShadow: '0 1px 3px rgba(27,43,75,0.06), 0 8px 24px rgba(27,43,75,0.08), 0 24px 48px rgba(27,43,75,0.06)' }}
-      >
-        {/* Accent bar */}
-        <div className="h-[3px] accent-bar" />
-
+      <CardShell>
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.35 }}
-          className="px-7 pt-6 pb-5 flex items-center justify-between"
-          style={{ borderBottom: '1px solid #F0F3F7' }}
+          className="px-7 pt-6 pb-5 flex items-center justify-between border-b border-border-light"
         >
           <div>
             <div className="text-[13px] font-extrabold tracking-[-0.3px] text-foreground">
@@ -173,33 +152,14 @@ export default function Stage3Evaluation({ address, onComplete }: Stage3Props) {
           </div>
           <div
             className="flex items-center gap-1.5 rounded-badge px-3 py-[5px] text-[11px] font-semibold tracking-[0.3px]"
-            style={{ background: '#F0F7FF', border: '1px solid #D0E4F7', color: '#2E6AAA' }}
+            style={{ background: 'hsl(210 100% 97%)', border: '1px solid hsl(209 64% 89%)', color: 'hsl(var(--link-blue))' }}
           >
             <span className="w-1.5 h-1.5 rounded-full bg-success animate-live-pulse" />
             Analyzing
           </div>
         </motion.div>
 
-        {/* Address Row */}
-        <motion.div
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.55 }}
-          className="px-7 py-[18px] flex items-center gap-3"
-          style={{ background: '#F8FAFC', borderBottom: '1px solid #F0F3F7' }}
-        >
-          <div className="w-[34px] h-[34px] rounded-icon-bg bg-primary flex items-center justify-center shrink-0">
-            <MapPin className="w-4 h-4" style={{ color: '#C8A96E' }} />
-          </div>
-          <div>
-            <div className="text-[10px] uppercase tracking-[1.5px] text-muted-foreground mb-0.5">
-              Property
-            </div>
-            <div className="text-[13px] font-semibold text-foreground tracking-[-0.2px]">
-              {address || '1847 Ridgeline Dr, Scottsdale AZ 85251'}
-            </div>
-          </div>
-        </motion.div>
+        <AddressChip address={address} />
 
         {/* Steps */}
         <div className="px-7 pt-6 pb-5">
@@ -218,50 +178,45 @@ export default function Stage3Evaluation({ address, onComplete }: Stage3Props) {
         {/* Master Progress */}
         <div className="px-7 pb-5">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-[10px] uppercase tracking-[1.5px]" style={{ color: '#9AABB8' }}>
+            <span className="text-[10px] uppercase tracking-[1.5px] text-muted-foreground">
               Overall Progress
             </span>
-            <span
-              className="text-[13px] font-bold text-foreground"
-              style={{ fontVariantNumeric: 'tabular-nums' }}
-            >
+            <span className="text-[13px] font-bold text-foreground" style={{ fontVariantNumeric: 'tabular-nums' }}>
               {masterPct}%
             </span>
           </div>
-          <div className="h-1 rounded-sm overflow-hidden relative" style={{ background: '#EEF2F7' }}>
+          <div className="h-1 rounded-sm overflow-hidden relative" style={{ background: 'hsl(var(--body-bg))' }}>
             <div
               className="h-full rounded-sm relative"
               style={{
                 width: `${masterPct}%`,
-                background: 'linear-gradient(90deg, #1B2B4B 0%, #2E4A7A 60%, #C8A96E 100%)',
+                background: 'linear-gradient(90deg, hsl(var(--navy)) 0%, hsl(var(--mid-blue)) 60%, hsl(var(--gold)) 100%)',
                 transition: 'width 0.65s cubic-bezier(0.4, 0, 0.2, 1)',
               }}
             >
-              {/* Leading edge glow */}
               <div
                 className="absolute right-0 rounded-full"
                 style={{
                   top: '-2px',
                   width: 8,
                   height: 8,
-                  background: '#C8A96E',
+                  background: 'hsl(var(--gold))',
                   opacity: 0.7,
-                  boxShadow: '0 0 6px 2px rgba(200,169,110,0.4)',
+                  boxShadow: '0 0 6px 2px hsla(var(--gold) / 0.4)',
                 }}
               />
             </div>
           </div>
-          {/* Milestone ticks */}
           <div className="flex justify-between px-px mt-[5px]">
-            {[1, 2, 3, 4, 5].map(n => (
+            {[0, 1, 2, 3, 4].map(n => (
               <div
                 key={n}
                 className="rounded-full"
                 style={{
                   width: 3,
                   height: 3,
-                  background: stepStates[n - 1] === 'done' ? '#1B2B4B' : '#D8E3ED',
-                  transform: stepStates[n - 1] === 'done' ? 'scale(1.5)' : 'scale(1)',
+                  background: stepStates[n] === 'done' ? 'hsl(var(--navy))' : 'hsl(var(--border-input))',
+                  transform: stepStates[n] === 'done' ? 'scale(1.5)' : 'scale(1)',
                   transition: 'background 0.3s ease, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
                 }}
               />
@@ -271,12 +226,7 @@ export default function Stage3Evaluation({ address, onComplete }: Stage3Props) {
 
         {/* Result Card */}
         <AnimatePresence>
-          {showResult && (
-            <ResultCard
-              statShown={statShown}
-              address={address}
-            />
-          )}
+          {showResult && <ResultCard statShown={statShown} address={address} />}
         </AnimatePresence>
 
         {/* Action Row */}
@@ -288,15 +238,14 @@ export default function Stage3Evaluation({ address, onComplete }: Stage3Props) {
               transition={{ duration: 0.4 }}
               className="px-5 pb-6 flex items-center justify-between"
             >
-              <span className="text-[11px]" style={{ color: '#9AABB8' }}>
+              <span className="text-[11px] text-muted-foreground">
                 Continuing in <span className="font-semibold text-foreground">{countdown}</span>s
               </span>
               <button
                 onClick={handleAdvance}
-                className="flex items-center gap-2 rounded-lg px-6 py-[11px] text-[13px] font-semibold tracking-[0.3px] cursor-pointer border-none transition-all"
+                className="flex items-center gap-2 rounded-lg px-6 py-[11px] text-[13px] font-semibold tracking-[0.3px] cursor-pointer border-none transition-all bg-navy text-white"
                 style={{
-                  background: advancing ? '#2E9E60' : '#1B2B4B',
-                  color: '#FFFFFF',
+                  background: advancing ? 'hsl(var(--success))' : 'hsl(var(--navy))',
                   boxShadow: '0 2px 8px rgba(27,43,75,0.25), 0 1px 2px rgba(27,43,75,0.15)',
                 }}
               >
@@ -304,23 +253,21 @@ export default function Stage3Evaluation({ address, onComplete }: Stage3Props) {
                 {!advancing && (
                   <span
                     className="w-4 h-4 rounded flex items-center justify-center"
-                    style={{ background: 'rgba(200,169,110,0.25)' }}
+                    style={{ background: 'hsla(var(--gold) / 0.25)' }}
                   >
-                    <ArrowRight className="w-2 h-2" style={{ color: '#C8A96E' }} />
+                    <ArrowRight className="w-2 h-2 text-gold" />
                   </span>
                 )}
               </button>
             </motion.div>
           )}
         </AnimatePresence>
-      </motion.div>
+      </CardShell>
     </div>
   );
 }
 
-/* ════════════════════════════════════════════════════════════
-   STEP ROW
-   ════════════════════════════════════════════════════════════ */
+/* ═══ STEP ROW ═══ */
 interface StepRowProps {
   step: StepConfig;
   state: StepState;
@@ -352,27 +299,21 @@ function StepRow({ step, state, index, visibleSourceCount, confirmedSources }: S
             width: 20,
             height: 20,
             borderRadius: '50%',
-            border: `1.5px solid ${isDone ? '#1B2B4B' : isActive ? '#1B2B4B' : '#D8E3ED'}`,
-            background: isDone ? '#1B2B4B' : isActive ? '#F0F4FA' : '#FFFFFF',
+            border: `1.5px solid ${isDone || isActive ? 'hsl(var(--navy))' : 'hsl(var(--border-input))'}`,
+            background: isDone ? 'hsl(var(--navy))' : isActive ? 'hsl(214 40% 96%)' : 'hsl(var(--card))',
             transition: 'border-color 0.3s ease, background 0.3s ease',
             animation: isDone ? 'dotComplete 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)' : undefined,
           }}
         >
-          {/* Pulse ring for active */}
           {isActive && (
             <div
               className="absolute rounded-full animate-ring-pulse"
-              style={{
-                inset: -4,
-                border: '1.5px solid #1B2B4B',
-                opacity: 0.2,
-              }}
+              style={{ inset: -4, border: '1.5px solid hsl(var(--navy))', opacity: 0.2 }}
             />
           )}
-          {/* Checkmark */}
           {isDone && (
             <svg width="9" height="9" viewBox="0 0 10 10" fill="none">
-              <polyline points="1.5,5.5 4,8 8.5,2.5" stroke="#FFFFFF" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+              <polyline points="1.5,5.5 4,8 8.5,2.5" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           )}
         </div>
@@ -383,25 +324,23 @@ function StepRow({ step, state, index, visibleSourceCount, confirmedSources }: S
             className="text-[12.5px] mb-1.5 truncate"
             style={{
               fontWeight: isActive ? 600 : 500,
-              color: isActive || isDone ? '#1B2B4B' : '#4A5E72',
+              color: isActive || isDone ? 'hsl(var(--navy))' : 'hsl(var(--text-body))',
               transition: 'color 0.3s ease',
             }}
           >
             {step.label}
           </div>
-          {/* Track */}
-          <div className="h-0.5 rounded-sm overflow-hidden relative" style={{ background: '#EEF2F7' }}>
+          <div className="h-0.5 rounded-sm overflow-hidden relative" style={{ background: 'hsl(var(--body-bg))' }}>
             <div
               className="h-full rounded-sm relative"
               style={{
                 width: isActive || isDone ? '100%' : '0%',
                 background: isDone
-                  ? 'linear-gradient(90deg, #1B2B4B, #2E6AAA)'
-                  : 'linear-gradient(90deg, #2E4A7A, #1B2B4B)',
+                  ? 'linear-gradient(90deg, hsl(var(--navy)), hsl(var(--link-blue)))'
+                  : 'linear-gradient(90deg, hsl(var(--mid-blue)), hsl(var(--navy)))',
                 transition: 'width 0.9s cubic-bezier(0.4, 0, 0.2, 1)',
               }}
             >
-              {/* Shimmer on active */}
               {isActive && (
                 <div
                   className="absolute top-0 h-full"
@@ -421,7 +360,7 @@ function StepRow({ step, state, index, visibleSourceCount, confirmedSources }: S
         <span
           className="text-[10px] tracking-[0.5px] min-w-[48px] text-right shrink-0"
           style={{
-            color: isDone ? '#2E9E60' : isActive ? '#2E6AAA' : '#B0BEC8',
+            color: isDone ? 'hsl(var(--success))' : isActive ? 'hsl(var(--link-blue))' : 'hsl(var(--text-dim))',
             fontWeight: isDone ? 600 : 400,
             transition: 'color 0.3s ease',
           }}
@@ -430,7 +369,7 @@ function StepRow({ step, state, index, visibleSourceCount, confirmedSources }: S
         </span>
       </div>
 
-      {/* Sub-sources (Kayak-style) */}
+      {/* Sub-sources */}
       {hasSubs && (
         <div
           style={{
@@ -451,14 +390,11 @@ function StepRow({ step, state, index, visibleSourceCount, confirmedSources }: S
                 className="flex items-center gap-[7px] h-5 text-[11px]"
                 style={{
                   opacity: isSourceVisible ? 1 : 0,
-                  color: isConfirmed ? '#2E9E60' : isSourceVisible ? '#7A94A8' : '#B0BEC8',
+                  color: isConfirmed ? 'hsl(var(--success))' : isSourceVisible ? 'hsl(var(--text-muted))' : 'hsl(var(--text-dim))',
                   transition: 'opacity 0.3s ease, color 0.3s ease',
                 }}
               >
-                <div
-                  className="rounded-full shrink-0"
-                  style={{ width: 4, height: 4, background: 'currentColor' }}
-                />
+                <div className="rounded-full shrink-0" style={{ width: 4, height: 4, background: 'currentColor' }} />
                 {source}
               </div>
             );
@@ -469,58 +405,42 @@ function StepRow({ step, state, index, visibleSourceCount, confirmedSources }: S
   );
 }
 
-/* ════════════════════════════════════════════════════════════
-   RESULT CARD
-   ════════════════════════════════════════════════════════════ */
+/* ═══ RESULT CARD ═══ */
 function ResultCard({ statShown, address }: { statShown: boolean[]; address: string }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 12, scale: 0.98 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ duration: 0.5, ease: [0.34, 1.2, 0.64, 1] as [number, number, number, number] }}
-      className="mx-5 mb-5 rounded-xl relative overflow-hidden"
-      style={{
-        background: '#F8FAFC',
-        border: '1px solid #E4ECF4',
-        padding: '20px 22px',
-        boxShadow: '0 4px 16px rgba(27,43,75,0.08)',
-      }}
+      className="mx-5 mb-5 rounded-xl relative overflow-hidden bg-surface-2 border border-border-light"
+      style={{ padding: '20px 22px', boxShadow: '0 4px 16px rgba(27,43,75,0.08)' }}
     >
-      {/* Left accent bar */}
+      {/* Left accent */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.2, duration: 0.4 }}
-        className="absolute left-0 top-0 bottom-0 w-[3px]"
-        style={{
-          background: 'linear-gradient(180deg, #1B2B4B, #C8A96E)',
-          borderRadius: '12px 0 0 12px',
-        }}
+        className="absolute left-0 top-0 bottom-0 w-[3px] rounded-l-xl accent-bar"
+        style={{ background: 'linear-gradient(180deg, hsl(var(--navy)), hsl(var(--gold)))' }}
       />
 
-      {/* Header */}
       <div className="flex items-start justify-between mb-3">
         <motion.div
           initial={{ opacity: 0, y: 6 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3, duration: 0.4 }}
-          className="text-[10px] font-bold tracking-[1.5px] uppercase rounded-badge px-3 py-1"
-          style={{ background: '#1B2B4B', color: '#C8A96E' }}
+          className="text-[10px] font-bold tracking-[1.5px] uppercase rounded-badge px-3 py-1 bg-navy text-gold"
         >
           Strong Alignment
         </motion.div>
-        <span className="text-[11px] pt-0.5" style={{ color: '#9AABB8' }}>
-          Confidence · 94%
-        </span>
+        <span className="text-[11px] pt-0.5 text-muted-foreground">Confidence · 94%</span>
       </div>
 
-      {/* Headline */}
       <motion.div
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4, duration: 0.4 }}
-        className="text-[22px] font-extrabold tracking-[-0.5px] leading-tight mb-1.5"
-        style={{ color: '#1B2B4B' }}
+        className="text-[22px] font-extrabold tracking-[-0.5px] leading-tight mb-1.5 text-foreground"
       >
         Top Market Tier
       </motion.div>
@@ -528,13 +448,11 @@ function ResultCard({ statShown, address }: { statShown: boolean[]; address: str
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.5, duration: 0.4 }}
-        className="text-[11px] uppercase tracking-[1px] mb-4"
-        style={{ color: '#7A94A8' }}
+        className="text-[11px] uppercase tracking-[1px] mb-4 text-muted-foreground"
       >
         Active Demand · ZIP {address.match(/\d{5}/)?.[0] || '85251'} · Top Quartile
       </motion.div>
 
-      {/* Typewriter body */}
       <div className="mb-[18px] min-h-[42px]">
         <TypewriterText
           text="Your property aligns strongly with active market conditions. A certified LPT agent will review your assessment and reach out within 48 hours."
@@ -542,11 +460,7 @@ function ResultCard({ statShown, address }: { statShown: boolean[]; address: str
         />
       </div>
 
-      {/* Stats row */}
-      <div
-        className="grid grid-cols-4 pt-4"
-        style={{ borderTop: '1px solid #E4ECF4' }}
-      >
+      <div className="grid grid-cols-4 pt-4 border-t border-border-light">
         <StatItem label="Est. Value" value="$487–521K" unit="RANGE" shown={statShown[0]} isText />
         <StatItem label="Demand" value={87} unit="/ 100" shown={statShown[1]} />
         <StatItem label="Days to Offer" value={14} unit="AVG" shown={statShown[2]} />
@@ -558,28 +472,15 @@ function ResultCard({ statShown, address }: { statShown: boolean[]; address: str
 
 /* ── Stat Item ── */
 function StatItem({
-  label,
-  value,
-  unit,
-  shown,
-  isText,
-  isLast,
+  label, value, unit, shown, isText, isLast,
 }: {
-  label: string;
-  value: string | number;
-  unit: string;
-  shown: boolean;
-  isText?: boolean;
-  isLast?: boolean;
+  label: string; value: string | number; unit: string; shown: boolean; isText?: boolean; isLast?: boolean;
 }) {
-  const [displayVal, setDisplayVal] = useState<string>(typeof value === 'string' ? '—' : '—');
+  const [displayVal, setDisplayVal] = useState<string>('—');
 
   useEffect(() => {
     if (!shown) return;
-    if (isText || typeof value === 'string') {
-      setDisplayVal(value as string);
-      return;
-    }
+    if (isText || typeof value === 'string') { setDisplayVal(value as string); return; }
     const target = value as number;
     const duration = target > 50 ? 800 : target > 10 ? 600 : 400;
     const start = performance.now();
@@ -596,24 +497,17 @@ function StatItem({
     <div
       className="text-center px-1.5"
       style={{
-        borderRight: isLast ? 'none' : '1px solid #E4ECF4',
+        borderRight: isLast ? 'none' : '1px solid hsl(var(--border-light))',
         opacity: shown ? 1 : 0,
         transform: shown ? 'translateY(0)' : 'translateY(8px)',
         transition: 'opacity 0.35s ease, transform 0.35s ease',
       }}
     >
-      <div className="text-[9px] tracking-[1.5px] uppercase mb-1" style={{ color: '#9AABB8' }}>
-        {label}
-      </div>
-      <div
-        className="text-[16px] font-extrabold leading-none"
-        style={{ color: '#1B2B4B', fontVariantNumeric: 'tabular-nums' }}
-      >
+      <div className="text-[9px] tracking-[1.5px] uppercase mb-1 text-muted-foreground">{label}</div>
+      <div className="text-[16px] font-extrabold leading-none text-foreground" style={{ fontVariantNumeric: 'tabular-nums' }}>
         {displayVal}
       </div>
-      <div className="text-[9px] mt-0.5" style={{ color: '#9AABB8' }}>
-        {unit}
-      </div>
+      <div className="text-[9px] mt-0.5 text-muted-foreground">{unit}</div>
     </div>
   );
 }
@@ -633,23 +527,17 @@ function TypewriterText({ text, speed }: { text: string; speed: number }) {
     return () => clearInterval(interval);
   }, [text, speed]);
 
-  // Blink cursor
   useEffect(() => {
     const interval = setInterval(() => setShowCursor(prev => !prev), 450);
     return () => clearInterval(interval);
   }, []);
 
   return (
-    <p className="text-[13px] leading-[1.65]" style={{ color: '#4A5E72' }}>
+    <p className="text-[13px] leading-[1.65] text-text-body">
       {displayed}
       <span
-        className="inline-block align-bottom ml-0.5"
-        style={{
-          width: 1.5,
-          height: 14,
-          background: '#1B2B4B',
-          opacity: showCursor ? 1 : 0,
-        }}
+        className="inline-block align-bottom ml-0.5 bg-foreground"
+        style={{ width: 1.5, height: 14, opacity: showCursor ? 1 : 0 }}
       />
     </p>
   );

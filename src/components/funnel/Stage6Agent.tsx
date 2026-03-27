@@ -1,7 +1,10 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { MapPin, Star, Check, Loader2 } from 'lucide-react';
+import { Star, Check, Loader2 } from 'lucide-react';
 import type { Agent } from '@/lib/types';
+import CardShell from './CardShell';
+import CardHeader from './CardHeader';
+import AddressChip from './AddressChip';
 
 interface Stage6Props {
   address: string;
@@ -11,7 +14,6 @@ interface Stage6Props {
 
 const SPRING: [number, number, number, number] = [0.34, 1.56, 0.64, 1];
 
-// Fallback default agent
 const DEFAULT_AGENT: Agent = {
   id: 'default',
   name: 'Regional Specialist',
@@ -34,7 +36,7 @@ function StarRating({ rating }: { rating: number }) {
         <Star
           key={i}
           className="w-3.5 h-3.5"
-          fill={i <= Math.floor(rating) ? 'hsl(var(--gold))' : i <= rating ? 'hsl(var(--gold))' : 'none'}
+          fill={i <= Math.floor(rating) ? 'hsl(var(--gold))' : 'none'}
           stroke="hsl(var(--gold))"
           strokeWidth={1.5}
         />
@@ -62,47 +64,10 @@ export default function Stage6Agent({ address, agent, onConfirm }: Stage6Props) 
 
   return (
     <div className="min-h-screen bg-background flex flex-col items-center justify-center px-5 py-12">
-      <motion.div
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: SPRING, delay: 0.1 }}
-        className="w-full max-w-[560px] bg-card rounded-card overflow-hidden shadow-card"
-      >
-        <div className="h-[3px] accent-bar" />
+      <CardShell>
+        <CardHeader subtitle="Your Specialist is Ready" stage={6} />
+        <AddressChip address={address} />
 
-        {/* Header */}
-        <div className="px-7 pt-6 pb-5 flex items-center justify-between" style={{ borderBottom: '1px solid hsl(var(--border-light))' }}>
-          <div>
-            <div className="text-[13px] font-extrabold tracking-[-0.3px] text-foreground">
-              Buy<span className="text-gold">My</span>House
-            </div>
-            <div className="text-[11px] text-muted-foreground mt-0.5 tracking-[0.3px]">
-              Your Specialist is Ready
-            </div>
-          </div>
-          <div className="flex gap-1.5">
-            {[0, 1, 2, 3, 4].map(i => (
-              <div
-                key={i}
-                className="w-[6px] h-[6px] rounded-full"
-                style={{ background: i < 4 ? 'hsl(var(--navy))' : 'hsl(var(--border-input))' }}
-              />
-            ))}
-          </div>
-        </div>
-
-        {/* Address Row */}
-        <div className="px-7 py-[18px] flex items-center gap-3 bg-surface-2" style={{ borderBottom: '1px solid hsl(var(--border-light))' }}>
-          <div className="w-[34px] h-[34px] rounded-icon-bg bg-primary flex items-center justify-center shrink-0">
-            <MapPin className="w-4 h-4 text-gold" />
-          </div>
-          <div>
-            <div className="text-[10px] uppercase tracking-[1.5px] text-muted-foreground mb-0.5">Property</div>
-            <div className="text-[13px] font-semibold text-foreground tracking-[-0.2px]">{address || '123 Main St, Austin TX 78701'}</div>
-          </div>
-        </div>
-
-        {/* Content */}
         <div className="px-7 pt-7 pb-6">
           <motion.div
             initial={{ opacity: 0, y: 8 }}
@@ -122,15 +87,10 @@ export default function Stage6Agent({ address, agent, onConfirm }: Stage6Props) 
             initial={{ opacity: 0, scale: 0.96, y: 12 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             transition={{ duration: 0.5, ease: SPRING, delay: 0.3 }}
-            className="rounded-xl p-5 mb-6"
-            style={{
-              background: 'hsl(var(--card))',
-              border: '1px solid hsl(var(--border-light))',
-              boxShadow: '0 1px 3px rgba(27,43,75,0.06), 0 4px 12px rgba(27,43,75,0.08)',
-            }}
+            className="rounded-xl p-5 mb-6 bg-card border border-border-light"
+            style={{ boxShadow: '0 1px 3px rgba(27,43,75,0.06), 0 4px 12px rgba(27,43,75,0.08)' }}
           >
             <div className="flex gap-4">
-              {/* Photo */}
               {displayAgent.photo_url ? (
                 <img
                   src={displayAgent.photo_url}
@@ -138,9 +98,7 @@ export default function Stage6Agent({ address, agent, onConfirm }: Stage6Props) 
                   className="w-[72px] h-[72px] rounded-full object-cover shrink-0"
                 />
               ) : (
-                <div
-                  className="w-[72px] h-[72px] rounded-full flex items-center justify-center shrink-0 bg-navy"
-                >
+                <div className="w-[72px] h-[72px] rounded-full flex items-center justify-center shrink-0 bg-navy">
                   <span className="text-[20px] font-bold text-gold">{initials}</span>
                 </div>
               )}
@@ -200,7 +158,7 @@ export default function Stage6Agent({ address, agent, onConfirm }: Stage6Props) 
             )}
           </motion.button>
         </div>
-      </motion.div>
+      </CardShell>
     </div>
   );
 }
