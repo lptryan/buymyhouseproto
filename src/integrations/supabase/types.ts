@@ -14,7 +14,206 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      agents: {
+        Row: {
+          active: boolean
+          bio: string | null
+          created_at: string
+          deals_closed: number
+          email: string
+          id: string
+          name: string
+          phone: string
+          photo_url: string | null
+          rating: number
+          specialization: string | null
+          title: string
+          updated_at: string
+          zip_codes: string[]
+        }
+        Insert: {
+          active?: boolean
+          bio?: string | null
+          created_at?: string
+          deals_closed?: number
+          email?: string
+          id?: string
+          name: string
+          phone?: string
+          photo_url?: string | null
+          rating?: number
+          specialization?: string | null
+          title?: string
+          updated_at?: string
+          zip_codes?: string[]
+        }
+        Update: {
+          active?: boolean
+          bio?: string | null
+          created_at?: string
+          deals_closed?: number
+          email?: string
+          id?: string
+          name?: string
+          phone?: string
+          photo_url?: string | null
+          rating?: number
+          specialization?: string | null
+          title?: string
+          updated_at?: string
+          zip_codes?: string[]
+        }
+        Relationships: []
+      }
+      leads: {
+        Row: {
+          address: string
+          agent_id: string | null
+          city: string | null
+          condition: string | null
+          created_at: string
+          email: string
+          id: string
+          motivation: string | null
+          name: string
+          phone: string
+          stage_completed: number
+          stage_reached: number
+          state: string | null
+          timeline: string | null
+          updated_at: string
+          utm_campaign: string | null
+          utm_medium: string | null
+          utm_source: string | null
+          zip: string | null
+        }
+        Insert: {
+          address: string
+          agent_id?: string | null
+          city?: string | null
+          condition?: string | null
+          created_at?: string
+          email?: string
+          id?: string
+          motivation?: string | null
+          name?: string
+          phone?: string
+          stage_completed?: number
+          stage_reached?: number
+          state?: string | null
+          timeline?: string | null
+          updated_at?: string
+          utm_campaign?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+          zip?: string | null
+        }
+        Update: {
+          address?: string
+          agent_id?: string | null
+          city?: string | null
+          condition?: string | null
+          created_at?: string
+          email?: string
+          id?: string
+          motivation?: string | null
+          name?: string
+          phone?: string
+          stage_completed?: number
+          stage_reached?: number
+          state?: string | null
+          timeline?: string | null
+          updated_at?: string
+          utm_campaign?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+          zip?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "leads_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      market_snapshots: {
+        Row: {
+          absorption_rate: number
+          days_on_market: number
+          fetched_at: string
+          id: string
+          median_price: number
+          price_per_sqft: number
+          trend: string
+          zip: string
+        }
+        Insert: {
+          absorption_rate?: number
+          days_on_market?: number
+          fetched_at?: string
+          id?: string
+          median_price?: number
+          price_per_sqft?: number
+          trend?: string
+          zip: string
+        }
+        Update: {
+          absorption_rate?: number
+          days_on_market?: number
+          fetched_at?: string
+          id?: string
+          median_price?: number
+          price_per_sqft?: number
+          trend?: string
+          zip?: string
+        }
+        Relationships: []
+      }
+      property_snapshots: {
+        Row: {
+          address: string
+          arv: number
+          baths: number
+          beds: number
+          estimated_value: number
+          fetched_at: string
+          id: string
+          source: string | null
+          sqft: number
+          year_built: number
+          zip: string
+        }
+        Insert: {
+          address: string
+          arv?: number
+          baths?: number
+          beds?: number
+          estimated_value?: number
+          fetched_at?: string
+          id?: string
+          source?: string | null
+          sqft?: number
+          year_built?: number
+          zip?: string
+        }
+        Update: {
+          address?: string
+          arv?: number
+          baths?: number
+          beds?: number
+          estimated_value?: number
+          fetched_at?: string
+          id?: string
+          source?: string | null
+          sqft?: number
+          year_built?: number
+          zip?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
