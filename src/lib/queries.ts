@@ -56,8 +56,8 @@ export async function submitLead(params: {
   email: string;
   phone: string;
   agentId: string | null;
-}): Promise<string> {
-  const { data, error } = await supabase
+}): Promise<void> {
+  const { error } = await supabase
     .from('leads')
     .insert({
       address: params.address,
@@ -74,10 +74,7 @@ export async function submitLead(params: {
       stage_reached: 7,
       stage_completed: 7,
       status: 'new',
-    })
-    .select('id')
-    .single();
+    });
 
   if (error) throw error;
-  return data.id;
 }
