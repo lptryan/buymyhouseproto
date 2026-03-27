@@ -76,13 +76,19 @@ export type Database = {
           id: string
           motivation: string | null
           name: string
+          notes: string | null
           phone: string
+          place_id: string | null
+          referrer: string | null
           stage_completed: number
           stage_reached: number
           state: string | null
+          status: string | null
+          street: string | null
           timeline: string | null
           updated_at: string
           utm_campaign: string | null
+          utm_content: string | null
           utm_medium: string | null
           utm_source: string | null
           zip: string | null
@@ -97,13 +103,19 @@ export type Database = {
           id?: string
           motivation?: string | null
           name?: string
+          notes?: string | null
           phone?: string
+          place_id?: string | null
+          referrer?: string | null
           stage_completed?: number
           stage_reached?: number
           state?: string | null
+          status?: string | null
+          street?: string | null
           timeline?: string | null
           updated_at?: string
           utm_campaign?: string | null
+          utm_content?: string | null
           utm_medium?: string | null
           utm_source?: string | null
           zip?: string | null
@@ -118,13 +130,19 @@ export type Database = {
           id?: string
           motivation?: string | null
           name?: string
+          notes?: string | null
           phone?: string
+          place_id?: string | null
+          referrer?: string | null
           stage_completed?: number
           stage_reached?: number
           state?: string | null
+          status?: string | null
+          street?: string | null
           timeline?: string | null
           updated_at?: string
           utm_campaign?: string | null
+          utm_content?: string | null
           utm_medium?: string | null
           utm_source?: string | null
           zip?: string | null
@@ -142,6 +160,7 @@ export type Database = {
       market_snapshots: {
         Row: {
           absorption_rate: number
+          active_listings: number | null
           days_on_market: number
           fetched_at: string
           id: string
@@ -152,6 +171,7 @@ export type Database = {
         }
         Insert: {
           absorption_rate?: number
+          active_listings?: number | null
           days_on_market?: number
           fetched_at?: string
           id?: string
@@ -162,6 +182,7 @@ export type Database = {
         }
         Update: {
           absorption_rate?: number
+          active_listings?: number | null
           days_on_market?: number
           fetched_at?: string
           id?: string
