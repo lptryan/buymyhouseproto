@@ -1,9 +1,29 @@
+import { useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Check, Share2 } from 'lucide-react';
 import type { Agent } from '@/lib/types';
 import CardShell from './CardShell';
 import CardHeader from './CardHeader';
 import AddressChip from './AddressChip';
+
+function playSuccessSound() {
+  try {
+    const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+    const notes = [523.25, 659.25, 783.99]; // C5, E5, G5 major chord arpeggio
+    notes.forEach((freq, i) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0, ctx.currentTime + i * 0.12);
+      gain.gain.linearRampToValueAtTime(0.15, ctx.currentTime + i * 0.12 + 0.05);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.12 + 0.6);
+      osc.connect(gain).connect(ctx.destination);
+      osc.start(ctx.currentTime + i * 0.12);
+      osc.stop(ctx.currentTime + i * 0.12 + 0.6);
+    });
+  } catch { /* silent fallback */ }
+}
 
 interface Stage7Props {
   address: string;
