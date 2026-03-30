@@ -4,6 +4,73 @@ import { Check, ArrowRight } from 'lucide-react';
 import CardShell from './CardShell';
 import AddressChip from './AddressChip';
 
+/* ── Synthesized loading sound (Nintendo eShop-inspired gentle chime loop) ── */
+function createLoadingSound() {
+  let ctx: AudioContext | null = null;
+  let masterGain: GainNode | null = null;
+  let intervalId: number | null = null;
+  let stopped = false;
+
+  const start = () => {
+    try {
+      ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      masterGain = ctx.createGain();
+      masterGain.gain.value = 0.12;
+      masterGain.connect(ctx.destination);
+
+      // Gentle pentatonic notes for a warm, techy feel
+      const notes = [523.25, 587.33, 659.25, 783.99, 880, 783.99, 659.25, 587.33];
+      let noteIndex = 0;
+
+      const playNote = () => {
+        if (stopped || !ctx || !masterGain) return;
+
+        const osc = ctx.createOscillator();
+        const noteGain = ctx.createGain();
+        const filter = ctx.createBiquadFilter();
+
+        // Soft sine/triangle blend
+        osc.type = noteIndex % 2 === 0 ? 'sine' : 'triangle';
+        osc.frequency.value = notes[noteIndex % notes.length];
+
+        // Gentle low-pass for warmth
+        filter.type = 'lowpass';
+        filter.frequency.value = 2000;
+        filter.Q.value = 1;
+
+        // Soft envelope
+        const now = ctx.currentTime;
+        noteGain.gain.setValueAtTime(0, now);
+        noteGain.gain.linearRampToValueAtTime(0.3, now + 0.08);
+        noteGain.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
+
+        osc.connect(filter);
+        filter.connect(noteGain);
+        noteGain.connect(masterGain);
+
+        osc.start(now);
+        osc.stop(now + 0.5);
+        noteIndex++;
+      };
+
+      // Play first note immediately, then loop
+      playNote();
+      intervalId = window.setInterval(playNote, 500);
+    } catch { /* silent fallback */ }
+  };
+
+  const stop = () => {
+    stopped = true;
+    if (intervalId) clearInterval(intervalId);
+    if (masterGain && ctx) {
+      masterGain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.3);
+      setTimeout(() => ctx?.close(), 400);
+    }
+  };
+
+  return { start, stop };
+}
+
 interface Stage3Props {
   address: string;
   onComplete: () => void;
@@ -63,6 +130,7 @@ export default function Stage3Evaluation({ address, onComplete }: Stage3Props) {
   const [advancing, setAdvancing] = useState(false);
   const timersRef = useRef<number[]>([]);
   const cdRef = useRef<number | null>(null);
+  const loadingSoundRef = useRef<ReturnType<typeof createLoadingSound> | null>(null);
 
   const T = useCallback((delay: number, fn: () => void) => {
     timersRef.current.push(window.setTimeout(fn, delay));
@@ -77,6 +145,11 @@ export default function Stage3Evaluation({ address, onComplete }: Stage3Props) {
   }, []);
 
   useEffect(() => {
+    // Start loading sound
+    const sound = createLoadingSound();
+    loadingSoundRef.current = sound;
+    T(600, () => sound.start()); // slight delay to sync with first step appearing
+
     TIMELINE.forEach((tl, i) => {
       T(tl.show, () => setStep(i, 'visible'));
       T(tl.activate, () => {
@@ -96,7 +169,11 @@ export default function Stage3Evaluation({ address, onComplete }: Stage3Props) {
       tl.masterAt.forEach(({ t, v }) => T(t, () => setMasterPct(v)));
     });
 
-    T(7300, () => setShowResult(true));
+    T(7300, () => {
+      setShowResult(true);
+      // Stop loading sound when results appear
+      loadingSoundRef.current?.stop();
+    });
     T(7700, () => setStatShown(prev => { const n = [...prev]; n[0] = true; return n; }));
     T(7900, () => setStatShown(prev => { const n = [...prev]; n[1] = true; return n; }));
     T(8100, () => setStatShown(prev => { const n = [...prev]; n[2] = true; return n; }));
@@ -106,6 +183,7 @@ export default function Stage3Evaluation({ address, onComplete }: Stage3Props) {
     return () => {
       timersRef.current.forEach(clearTimeout);
       if (cdRef.current) clearInterval(cdRef.current);
+      loadingSoundRef.current?.stop();
     };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
