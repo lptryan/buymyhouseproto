@@ -34,6 +34,7 @@ export default function Stage1Hero({ onSubmitAddress, onContinueToAssessment }: 
     e.preventDefault();
     if (!address.trim()) return;
     
+    playButtonSound();
     onSubmitAddress(address.trim(), '', '', '');
     setShowStage2(true);
   };
