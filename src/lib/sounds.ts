@@ -42,12 +42,32 @@ export function playWhooshSound() {
 }
 
 
-/** Short crisp button click — uses uploaded audio sample */
+/** Short crisp button click — uses preloaded audio pool for instant playback */
+const POOL_SIZE = 4;
+const clickPool: HTMLAudioElement[] = [];
+let poolIndex = 0;
+
+// Eagerly preload a pool of Audio elements so playback is instant
+function ensureClickPool() {
+  if (clickPool.length > 0) return;
+  for (let i = 0; i < POOL_SIZE; i++) {
+    const a = new Audio(clickSrc);
+    a.volume = 0.5;
+    a.preload = 'auto';
+    a.load();
+    clickPool.push(a);
+  }
+}
+
+// Kick off preload immediately on module import
+ensureClickPool();
 
 export function playButtonSound() {
   try {
-    const audio = new Audio(clickSrc);
-    audio.volume = 0.5;
+    ensureClickPool();
+    const audio = clickPool[poolIndex % POOL_SIZE];
+    poolIndex++;
+    audio.currentTime = 0;
     audio.play();
   } catch {}
 }
