@@ -119,7 +119,7 @@ export default function Stage7Confirmation({ address, agent }: Stage7Props) {
             <ConfettiDots />
             <motion.div
               initial={{ opacity: 0, scale: 0.3, rotate: -20 }}
-              animate={{ opacity: 1, scale: [0.3, 1.15, 1], rotate: [−20, 5, 0] }}
+              animate={{ opacity: 1, scale: [0.3, 1.15, 1], rotate: [-20, 5, 0] }}
               transition={{ duration: 0.7, ease: SPRING, delay: 0.2 }}
               className="w-16 h-16 rounded-full bg-success flex items-center justify-center relative z-10"
             >
