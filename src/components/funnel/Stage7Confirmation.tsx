@@ -38,8 +38,44 @@ const NEXT_STEPS = [
   { num: '3', text: () => "You'll receive a written assessment with your options — no obligation." },
 ];
 
+// Confetti-like burst particles
+function ConfettiDots() {
+  const dots = Array.from({ length: 12 }, (_, i) => {
+    const angle = (i / 12) * 360;
+    const radius = 60 + Math.random() * 30;
+    const x = Math.cos((angle * Math.PI) / 180) * radius;
+    const y = Math.sin((angle * Math.PI) / 180) * radius;
+    const colors = ['hsl(var(--success))', 'hsl(var(--gold))', 'hsl(var(--navy))'];
+    return { x, y, color: colors[i % 3], size: 4 + Math.random() * 4, delay: i * 0.04 };
+  });
+
+  return (
+    <>
+      {dots.map((dot, i) => (
+        <motion.div
+          key={i}
+          initial={{ opacity: 0, x: 0, y: 0, scale: 0 }}
+          animate={{ opacity: [0, 1, 0], x: dot.x, y: dot.y, scale: [0, 1.2, 0] }}
+          transition={{ duration: 0.8, delay: 0.3 + dot.delay, ease: 'easeOut' }}
+          className="absolute rounded-full"
+          style={{ width: dot.size, height: dot.size, backgroundColor: dot.color }}
+        />
+      ))}
+    </>
+  );
+}
+
 export default function Stage7Confirmation({ address, agent }: Stage7Props) {
   const agentName = agent?.name || 'Your specialist';
+  const soundPlayed = useRef(false);
+
+  useEffect(() => {
+    if (!soundPlayed.current) {
+      soundPlayed.current = true;
+      const timer = setTimeout(playSuccessSound, 300);
+      return () => clearTimeout(timer);
+    }
+  }, []);
 
   const handleShare = async () => {
     if (navigator.share) {
