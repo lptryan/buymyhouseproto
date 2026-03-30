@@ -72,7 +72,13 @@ export default function Stage7Confirmation({ address, agent }: Stage7Props) {
   useEffect(() => {
     if (!soundPlayed.current) {
       soundPlayed.current = true;
-      const timer = setTimeout(playSuccessSound, 300);
+      const timer = setTimeout(() => {
+        playSuccessSound();
+        // Haptic feedback on supported devices
+        if (navigator.vibrate) {
+          navigator.vibrate([30, 50, 30]); // subtle double-tap pattern
+        }
+      }, 300);
       return () => clearTimeout(timer);
     }
   }, []);
