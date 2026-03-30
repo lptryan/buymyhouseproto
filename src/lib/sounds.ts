@@ -1,5 +1,5 @@
 /** Shared synthesized sound effects for the funnel */
-
+import clickSrc from '@/assets/quick_click.mp3';
 /** Subtle whoosh for stage transitions — filtered noise sweep */
 export function playWhooshSound() {
   try {
