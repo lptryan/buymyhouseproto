@@ -172,8 +172,9 @@ export default function Stage3Evaluation({ address, onComplete }: Stage3Props) {
 
     T(7300, () => {
       setShowResult(true);
-      // Stop loading sound when results appear
+      // Stop loading sound and play completion chime
       loadingSoundRef.current?.stop();
+      playCompletionChime();
     });
     T(7700, () => setStatShown(prev => { const n = [...prev]; n[0] = true; return n; }));
     T(7900, () => setStatShown(prev => { const n = [...prev]; n[1] = true; return n; }));
