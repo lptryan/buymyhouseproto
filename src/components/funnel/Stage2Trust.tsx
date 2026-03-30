@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { Zap, ShieldCheck, Sparkles, ArrowRight } from 'lucide-react';
+import { playButtonSound } from '@/lib/sounds';
 
 interface Stage2Props {
   onContinue: () => void;
