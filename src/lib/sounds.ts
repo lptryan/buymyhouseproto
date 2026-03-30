@@ -43,7 +43,6 @@ export function playWhooshSound() {
 
 
 /** Short crisp button click — uses uploaded audio sample */
-import clickSrc from '@/assets/quick_click.mp3';
 
 export function playButtonSound() {
   try {
