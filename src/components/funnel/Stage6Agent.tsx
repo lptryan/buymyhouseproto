@@ -52,6 +52,7 @@ export default function Stage6Agent({ address, agent, onConfirm }: Stage6Props) 
   const displayAgent = agent || DEFAULT_AGENT;
 
   const handleConfirm = async () => {
+    playButtonSound();
     setLoading(true);
     try {
       await onConfirm();

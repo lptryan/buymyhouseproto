@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { DollarSign, Plane, Home, ArrowDownRight, ArrowUpRight, RefreshCw, Search, Clock, Calendar, Timer, Hourglass, Compass, Sparkles, ThumbsUp, Wrench, AlertTriangle, HardHat, ArrowLeft } from 'lucide-react';
 import type { Motivation, Timeline, Condition } from '@/lib/types';
+import { playButtonSound } from '@/lib/sounds';
 import CardShell from './CardShell';
 import CardHeader from './CardHeader';
 import AddressChip from './AddressChip';

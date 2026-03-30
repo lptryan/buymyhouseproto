@@ -52,6 +52,7 @@ export default function Stage5Identity({ address, onComplete }: Stage5Props) {
       return;
     }
 
+    playButtonSound();
     setLoading(true);
     setTimeout(() => {
       onComplete(name.trim(), email.trim(), result.data.phone);
