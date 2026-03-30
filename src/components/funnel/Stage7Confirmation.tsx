@@ -1,9 +1,29 @@
+import { useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Check, Share2 } from 'lucide-react';
 import type { Agent } from '@/lib/types';
 import CardShell from './CardShell';
 import CardHeader from './CardHeader';
 import AddressChip from './AddressChip';
+
+function playSuccessSound() {
+  try {
+    const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+    const notes = [523.25, 659.25, 783.99]; // C5, E5, G5 major chord arpeggio
+    notes.forEach((freq, i) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0, ctx.currentTime + i * 0.12);
+      gain.gain.linearRampToValueAtTime(0.15, ctx.currentTime + i * 0.12 + 0.05);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.12 + 0.6);
+      osc.connect(gain).connect(ctx.destination);
+      osc.start(ctx.currentTime + i * 0.12);
+      osc.stop(ctx.currentTime + i * 0.12 + 0.6);
+    });
+  } catch { /* silent fallback */ }
+}
 
 interface Stage7Props {
   address: string;
@@ -18,8 +38,44 @@ const NEXT_STEPS = [
   { num: '3', text: () => "You'll receive a written assessment with your options — no obligation." },
 ];
 
+// Confetti-like burst particles
+function ConfettiDots() {
+  const dots = Array.from({ length: 12 }, (_, i) => {
+    const angle = (i / 12) * 360;
+    const radius = 60 + Math.random() * 30;
+    const x = Math.cos((angle * Math.PI) / 180) * radius;
+    const y = Math.sin((angle * Math.PI) / 180) * radius;
+    const colors = ['hsl(var(--success))', 'hsl(var(--gold))', 'hsl(var(--navy))'];
+    return { x, y, color: colors[i % 3], size: 4 + Math.random() * 4, delay: i * 0.04 };
+  });
+
+  return (
+    <>
+      {dots.map((dot, i) => (
+        <motion.div
+          key={i}
+          initial={{ opacity: 0, x: 0, y: 0, scale: 0 }}
+          animate={{ opacity: [0, 1, 0], x: dot.x, y: dot.y, scale: [0, 1.2, 0] }}
+          transition={{ duration: 0.8, delay: 0.3 + dot.delay, ease: 'easeOut' }}
+          className="absolute rounded-full"
+          style={{ width: dot.size, height: dot.size, backgroundColor: dot.color }}
+        />
+      ))}
+    </>
+  );
+}
+
 export default function Stage7Confirmation({ address, agent }: Stage7Props) {
   const agentName = agent?.name || 'Your specialist';
+  const soundPlayed = useRef(false);
+
+  useEffect(() => {
+    if (!soundPlayed.current) {
+      soundPlayed.current = true;
+      const timer = setTimeout(playSuccessSound, 300);
+      return () => clearTimeout(timer);
+    }
+  }, []);
 
   const handleShare = async () => {
     if (navigator.share) {
@@ -58,15 +114,18 @@ export default function Stage7Confirmation({ address, agent }: Stage7Props) {
         <AddressChip address={address} />
 
         <div className="px-7 pt-8 pb-6 text-center">
-          {/* Big checkmark */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.5, rotate: -10 }}
-            animate={{ opacity: 1, scale: 1, rotate: 0 }}
-            transition={{ duration: 0.6, ease: SPRING, delay: 0.2 }}
-            className="w-16 h-16 rounded-full bg-success flex items-center justify-center mx-auto mb-4"
-          >
-            <Check className="w-8 h-8 text-white" strokeWidth={3} />
-          </motion.div>
+          {/* Big checkmark with confetti */}
+          <div className="relative flex items-center justify-center mb-4">
+            <ConfettiDots />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.3, rotate: -20 }}
+              animate={{ opacity: 1, scale: [0.3, 1.15, 1], rotate: [-20, 5, 0] }}
+              transition={{ duration: 0.7, ease: SPRING, delay: 0.2 }}
+              className="w-16 h-16 rounded-full bg-success flex items-center justify-center relative z-10"
+            >
+              <Check className="w-8 h-8 text-white" strokeWidth={3} />
+            </motion.div>
+          </div>
 
           <motion.h2
             initial={{ opacity: 0, y: 8 }}
