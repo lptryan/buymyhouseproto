@@ -145,6 +145,11 @@ export default function Stage3Evaluation({ address, onComplete }: Stage3Props) {
   }, []);
 
   useEffect(() => {
+    // Start loading sound
+    const sound = createLoadingSound();
+    loadingSoundRef.current = sound;
+    T(600, () => sound.start()); // slight delay to sync with first step appearing
+
     TIMELINE.forEach((tl, i) => {
       T(tl.show, () => setStep(i, 'visible'));
       T(tl.activate, () => {
@@ -164,7 +169,11 @@ export default function Stage3Evaluation({ address, onComplete }: Stage3Props) {
       tl.masterAt.forEach(({ t, v }) => T(t, () => setMasterPct(v)));
     });
 
-    T(7300, () => setShowResult(true));
+    T(7300, () => {
+      setShowResult(true);
+      // Stop loading sound when results appear
+      loadingSoundRef.current?.stop();
+    });
     T(7700, () => setStatShown(prev => { const n = [...prev]; n[0] = true; return n; }));
     T(7900, () => setStatShown(prev => { const n = [...prev]; n[1] = true; return n; }));
     T(8100, () => setStatShown(prev => { const n = [...prev]; n[2] = true; return n; }));
@@ -174,6 +183,7 @@ export default function Stage3Evaluation({ address, onComplete }: Stage3Props) {
     return () => {
       timersRef.current.forEach(clearTimeout);
       if (cdRef.current) clearInterval(cdRef.current);
+      loadingSoundRef.current?.stop();
     };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
