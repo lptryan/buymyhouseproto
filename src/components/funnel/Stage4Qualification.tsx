@@ -44,6 +44,41 @@ const QUESTIONS = [
   { title: "What's the current condition of the home?", options: CONDITION_OPTIONS },
 ];
 
+const playButtonSound = () => {
+  try {
+    const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+    const now = ctx.currentTime;
+
+    // Short bright click — inspired by Nintendo eShop button press
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(1200, now);
+    osc.frequency.exponentialRampToValueAtTime(800, now + 0.06);
+    gain.gain.setValueAtTime(0.18, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.08);
+
+    // Subtle harmonic layer
+    const osc2 = ctx.createOscillator();
+    const gain2 = ctx.createGain();
+    osc2.type = 'triangle';
+    osc2.frequency.setValueAtTime(2400, now);
+    osc2.frequency.exponentialRampToValueAtTime(1600, now + 0.05);
+    gain2.gain.setValueAtTime(0.08, now);
+    gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
+    osc2.connect(gain2);
+    gain2.connect(ctx.destination);
+    osc2.start(now);
+    osc2.stop(now + 0.06);
+
+    setTimeout(() => ctx.close(), 200);
+  } catch {}
+};
+
 export default function Stage4Qualification({ address, onComplete, onBack }: Stage4Props) {
   const [currentQ, setCurrentQ] = useState(0);
   const [answers, setAnswers] = useState<(string | null)[]>([null, null, null]);
@@ -51,6 +86,7 @@ export default function Stage4Qualification({ address, onComplete, onBack }: Sta
   const [direction, setDirection] = useState(1);
 
   const handleSelect = (value: string) => {
+    playButtonSound();
     setSelectedValue(value);
     const newAnswers = [...answers];
     newAnswers[currentQ] = value;
