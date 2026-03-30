@@ -1,5 +1,5 @@
 /** Shared synthesized sound effects for the funnel */
-
+import clickSrc from '@/assets/quick_click.mp3';
 /** Subtle whoosh for stage transitions — filtered noise sweep */
 export function playWhooshSound() {
   try {
@@ -42,37 +42,13 @@ export function playWhooshSound() {
 }
 
 
-/** Short crisp button click — Nintendo eShop inspired */
+/** Short crisp button click — uses uploaded audio sample */
+
 export function playButtonSound() {
   try {
-    const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
-    const now = ctx.currentTime;
-
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(1200, now);
-    osc.frequency.exponentialRampToValueAtTime(800, now + 0.06);
-    gain.gain.setValueAtTime(0.18, now);
-    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    osc.start(now);
-    osc.stop(now + 0.08);
-
-    const osc2 = ctx.createOscillator();
-    const gain2 = ctx.createGain();
-    osc2.type = 'triangle';
-    osc2.frequency.setValueAtTime(2400, now);
-    osc2.frequency.exponentialRampToValueAtTime(1600, now + 0.05);
-    gain2.gain.setValueAtTime(0.08, now);
-    gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
-    osc2.connect(gain2);
-    gain2.connect(ctx.destination);
-    osc2.start(now);
-    osc2.stop(now + 0.06);
-
-    setTimeout(() => ctx.close(), 200);
+    const audio = new Audio(clickSrc);
+    audio.volume = 0.5;
+    audio.play();
   } catch {}
 }
 
