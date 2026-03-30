@@ -114,15 +114,18 @@ export default function Stage7Confirmation({ address, agent }: Stage7Props) {
         <AddressChip address={address} />
 
         <div className="px-7 pt-8 pb-6 text-center">
-          {/* Big checkmark */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.5, rotate: -10 }}
-            animate={{ opacity: 1, scale: 1, rotate: 0 }}
-            transition={{ duration: 0.6, ease: SPRING, delay: 0.2 }}
-            className="w-16 h-16 rounded-full bg-success flex items-center justify-center mx-auto mb-4"
-          >
-            <Check className="w-8 h-8 text-white" strokeWidth={3} />
-          </motion.div>
+          {/* Big checkmark with confetti */}
+          <div className="relative flex items-center justify-center mb-4">
+            <ConfettiDots />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.3, rotate: -20 }}
+              animate={{ opacity: 1, scale: [0.3, 1.15, 1], rotate: [−20, 5, 0] }}
+              transition={{ duration: 0.7, ease: SPRING, delay: 0.2 }}
+              className="w-16 h-16 rounded-full bg-success flex items-center justify-center relative z-10"
+            >
+              <Check className="w-8 h-8 text-white" strokeWidth={3} />
+            </motion.div>
+          </div>
 
           <motion.h2
             initial={{ opacity: 0, y: 8 }}
