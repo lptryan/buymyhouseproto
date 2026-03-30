@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import type { FunnelState, Motivation, Timeline, Condition, Agent } from '@/lib/types';
+import { playWhooshSound } from '@/lib/sounds';
 
 const initialState: FunnelState = {
   currentStage: 1,
@@ -21,6 +22,7 @@ export function useFunnel() {
   const [state, setState] = useState<FunnelState>(initialState);
 
   const goToStage = useCallback((stage: number) => {
+    playWhooshSound();
     setState(prev => ({ ...prev, currentStage: stage }));
   }, []);
 
