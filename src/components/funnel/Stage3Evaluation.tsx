@@ -130,6 +130,7 @@ export default function Stage3Evaluation({ address, onComplete }: Stage3Props) {
   const [advancing, setAdvancing] = useState(false);
   const timersRef = useRef<number[]>([]);
   const cdRef = useRef<number | null>(null);
+  const loadingSoundRef = useRef<ReturnType<typeof createLoadingSound> | null>(null);
 
   const T = useCallback((delay: number, fn: () => void) => {
     timersRef.current.push(window.setTimeout(fn, delay));
