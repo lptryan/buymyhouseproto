@@ -22,6 +22,7 @@ export function useFunnel() {
   const [state, setState] = useState<FunnelState>(initialState);
 
   const goToStage = useCallback((stage: number) => {
+    playWhooshSound();
     setState(prev => ({ ...prev, currentStage: stage }));
   }, []);
 
