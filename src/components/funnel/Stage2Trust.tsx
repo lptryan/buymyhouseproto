@@ -220,7 +220,7 @@ export default function Stage2Trust({ onContinue }: Stage2Props) {
           transition={{ duration: 0.4, delay: 0.9 }}
         >
           <motion.button
-            onClick={onContinue}
+            onClick={() => { playButtonSound(); onContinue(); }}
             whileHover={{ scale: 1.01 }}
             whileTap={{ scale: 0.98 }}
             className="w-full flex items-center justify-center gap-2 rounded-lg py-[14px] text-[14px] font-bold tracking-[0.3px] cursor-pointer border-none transition-all"
