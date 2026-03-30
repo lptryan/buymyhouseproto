@@ -2,6 +2,7 @@ import { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Lock, Loader2 } from 'lucide-react';
 import { z } from 'zod';
+import { playButtonSound } from '@/lib/sounds';
 import CardShell from './CardShell';
 import CardHeader from './CardHeader';
 import AddressChip from './AddressChip';
@@ -51,6 +52,7 @@ export default function Stage5Identity({ address, onComplete }: Stage5Props) {
       return;
     }
 
+    playButtonSound();
     setLoading(true);
     setTimeout(() => {
       onComplete(name.trim(), email.trim(), result.data.phone);

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MapPin, Shield, Clock, DollarSign } from 'lucide-react';
+import { playButtonSound } from '@/lib/sounds';
 import Stage2Trust from './Stage2Trust';
 
 interface Stage1HeroProps {
@@ -32,6 +33,7 @@ export default function Stage1Hero({ onSubmitAddress, onContinueToAssessment }: 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!address.trim()) return;
+    playButtonSound();
     onSubmitAddress(address.trim(), '', '', '');
     setShowStage2(true);
   };

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Star, Check, Loader2 } from 'lucide-react';
+import { playButtonSound } from '@/lib/sounds';
 import type { Agent } from '@/lib/types';
 import CardShell from './CardShell';
 import CardHeader from './CardHeader';
@@ -51,6 +52,7 @@ export default function Stage6Agent({ address, agent, onConfirm }: Stage6Props) 
   const displayAgent = agent || DEFAULT_AGENT;
 
   const handleConfirm = async () => {
+    playButtonSound();
     setLoading(true);
     try {
       await onConfirm();
