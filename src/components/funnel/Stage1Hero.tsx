@@ -33,7 +33,7 @@ export default function Stage1Hero({ onSubmitAddress, onContinueToAssessment }: 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!address.trim()) return;
-    playButtonSound();
+    
     onSubmitAddress(address.trim(), '', '', '');
     setShowStage2(true);
   };
