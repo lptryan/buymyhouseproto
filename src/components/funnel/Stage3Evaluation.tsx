@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Check, ArrowRight } from 'lucide-react';
+import { playCompletionChime } from '@/lib/sounds';
 import CardShell from './CardShell';
 import AddressChip from './AddressChip';
 
