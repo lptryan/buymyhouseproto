@@ -165,10 +165,10 @@ export default function Stage1Hero({ onSubmitAddress, onContinueToAssessment }: 
               <div className="absolute top-0 left-0 right-0 h-[3px] accent-bar" />
               <div className="text-center p-8">
                 <div
-                  className="w-20 h-20 rounded-full mx-auto mb-4 flex items-center justify-center"
+                  className="w-20 h-20 rounded-full mx-auto mb-4 flex items-center justify-center overflow-hidden"
                   style={{ background: '#F8FAFC' }}
                 >
-                  <MapPin className="w-8 h-8" style={{ color: '#C8A96E' }} />
+                  <img src={heroAnimation} alt="Home animation" className="w-12 h-12 object-contain" />
                 </div>
                 <p className="text-[18px] font-bold tracking-[-0.3px] mb-2" style={{ color: '#1B2B4B' }}>
                   Your Home, Valued
