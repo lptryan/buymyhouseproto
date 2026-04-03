@@ -103,15 +103,15 @@ export default function Stage1Hero({ onSubmitAddress, onContinueToAssessment }: 
             {/* Address form */}
             <form onSubmit={handleSubmit} className="mb-6">
               <div className="relative">
-                <img src={heroAnimation} alt="" className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 object-contain" />
+                <img src={heroAnimation} alt="" className="absolute left-3 top-1/2 -translate-y-1/2 w-[60px] h-[60px] object-contain" />
                 <input
                   type="text"
                   value={address}
                   onChange={(e) => setAddress(e.target.value)}
                   placeholder="Enter your property address…"
-                  className="w-full pl-14 pr-4 py-4 rounded-lg border text-foreground text-[15px] focus:outline-none transition-all"
+                  className="w-full pl-[76px] pr-4 py-5 rounded-lg border text-foreground text-[15px] focus:outline-none transition-all"
                   style={{
-                    background: '#F8FAFC',
+                    background: '#FFFFFF',
                     borderColor: '#D8E3ED',
                     borderWidth: '1.5px',
                   }}
