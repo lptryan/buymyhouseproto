@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MapPin, Shield, Clock, DollarSign } from 'lucide-react';
 import { playButtonSound } from '@/lib/sounds';
+import heroAnimation from '@/assets/buy_my_house_animation.gif';
 import Stage2Trust from './Stage2Trust';
 
 interface Stage1HeroProps {
