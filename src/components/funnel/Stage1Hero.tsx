@@ -1,9 +1,22 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MapPin, Shield, Clock, DollarSign } from 'lucide-react';
+import { Shield, Clock, DollarSign } from 'lucide-react';
 import { playButtonSound } from '@/lib/sounds';
 import heroAnimation from '@/assets/buy_my_house_animation.gif';
 import Stage2Trust from './Stage2Trust';
+
+import home1 from '@/assets/homes/home1.jpg';
+import home2 from '@/assets/homes/home2.jpg';
+import home3 from '@/assets/homes/home3.jpg';
+import home4 from '@/assets/homes/home4.jpg';
+import home5 from '@/assets/homes/home5.jpg';
+import home6 from '@/assets/homes/home6.jpg';
+import home7 from '@/assets/homes/home7.jpg';
+import home8 from '@/assets/homes/home8.jpg';
+import home9 from '@/assets/homes/home9.jpg';
+import home10 from '@/assets/homes/home10.jpg';
+
+const homeImages = [home1, home2, home3, home4, home5, home6, home7, home8, home9, home10];
 
 interface Stage1HeroProps {
   onSubmitAddress: (address: string, city: string, state: string, zip: string) => void;
@@ -22,12 +35,21 @@ export default function Stage1Hero({ onSubmitAddress, onContinueToAssessment }: 
   const [address, setAddress] = useState('');
   const [showStage2, setShowStage2] = useState(false);
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
+  const [currentHome, setCurrentHome] = useState(0);
 
   // Rotate testimonials
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentTestimonial(prev => (prev + 1) % testimonials.length);
     }, 4000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Rotate home images
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentHome(prev => (prev + 1) % homeImages.length);
+    }, 5000);
     return () => clearInterval(interval);
   }, []);
 
@@ -81,13 +103,13 @@ export default function Stage1Hero({ onSubmitAddress, onContinueToAssessment }: 
             {/* Address form */}
             <form onSubmit={handleSubmit} className="mb-6">
               <div className="relative">
-                <img src={heroAnimation} alt="" className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 object-contain" />
+                <img src={heroAnimation} alt="" className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 object-contain" />
                 <input
                   type="text"
                   value={address}
                   onChange={(e) => setAddress(e.target.value)}
                   placeholder="Enter your property address…"
-                  className="w-full pl-12 pr-4 py-4 rounded-lg border text-foreground text-[15px] focus:outline-none transition-all"
+                  className="w-full pl-14 pr-4 py-4 rounded-lg border text-foreground text-[15px] focus:outline-none transition-all"
                   style={{
                     background: '#F8FAFC',
                     borderColor: '#D8E3ED',
@@ -149,7 +171,7 @@ export default function Stage1Hero({ onSubmitAddress, onContinueToAssessment }: 
             </motion.div>
           </motion.div>
 
-          {/* Right column - hero visual */}
+          {/* Right column - home slideshow */}
           <motion.div
             initial={{ opacity: 0, scale: 0.96 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -157,36 +179,53 @@ export default function Stage1Hero({ onSubmitAddress, onContinueToAssessment }: 
             className="hidden lg:flex items-center justify-center"
           >
             <div
-              className="relative w-full max-w-md aspect-square rounded-card bg-card overflow-hidden flex items-center justify-center"
+              className="relative w-full max-w-md aspect-square rounded-card overflow-hidden"
               style={{
                 boxShadow: '0 1px 3px rgba(27,43,75,0.06), 0 8px 24px rgba(27,43,75,0.08), 0 24px 48px rgba(27,43,75,0.06)',
               }}
             >
-              <div className="absolute top-0 left-0 right-0 h-[3px] accent-bar" />
-              <div className="text-center p-8">
-                <div className="mx-auto mb-4 flex items-center justify-center">
-                  <img src={heroAnimation} alt="Home animation" className="w-24 h-24 object-contain" />
-                </div>
-                <p className="text-[18px] font-bold tracking-[-0.3px] mb-2" style={{ color: '#1B2B4B' }}>
+              <div className="absolute top-0 left-0 right-0 h-[3px] accent-bar z-10" />
+              <AnimatePresence mode="wait">
+                <motion.img
+                  key={currentHome}
+                  src={homeImages[currentHome]}
+                  alt="Home"
+                  initial={{ opacity: 0, scale: 1.05 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.98 }}
+                  transition={{ duration: 1.2, ease: [0.25, 0.46, 0.45, 0.94] }}
+                  className="absolute inset-0 w-full h-full object-cover"
+                />
+              </AnimatePresence>
+              {/* Overlay with stats */}
+              <div className="absolute bottom-0 left-0 right-0 p-6 z-10" style={{ background: 'linear-gradient(to top, rgba(27,43,75,0.85) 0%, rgba(27,43,75,0.4) 60%, transparent 100%)' }}>
+                <p className="text-[18px] font-bold tracking-[-0.3px] text-white mb-3">
                   Your Home, Valued
                 </p>
-                <p className="text-[13px]" style={{ color: '#4A5E72' }}>
-                  Get a comprehensive property assessment backed by real market data.
-                </p>
-                <div className="mt-6 grid grid-cols-3 gap-4 text-center">
+                <div className="grid grid-cols-3 gap-4 text-center">
                   <div>
-                    <p className="text-[18px] font-bold" style={{ color: '#1B2B4B' }}>12.4K+</p>
-                    <p className="text-[10px] font-semibold tracking-[1.5px] uppercase" style={{ color: '#9AABB8' }}>Sellers</p>
+                    <p className="text-[18px] font-bold text-white">12.4K+</p>
+                    <p className="text-[10px] font-semibold tracking-[1.5px] uppercase text-white/60">Sellers</p>
                   </div>
                   <div>
-                    <p className="text-[18px] font-bold" style={{ color: '#1B2B4B' }}>$2.1B</p>
-                    <p className="text-[10px] font-semibold tracking-[1.5px] uppercase" style={{ color: '#9AABB8' }}>Assessed</p>
+                    <p className="text-[18px] font-bold text-white">$2.1B</p>
+                    <p className="text-[10px] font-semibold tracking-[1.5px] uppercase text-white/60">Assessed</p>
                   </div>
                   <div>
-                    <p className="text-[18px] font-bold" style={{ color: '#1B2B4B' }}>4.9★</p>
-                    <p className="text-[10px] font-semibold tracking-[1.5px] uppercase" style={{ color: '#9AABB8' }}>Rating</p>
+                    <p className="text-[18px] font-bold text-white">4.9★</p>
+                    <p className="text-[10px] font-semibold tracking-[1.5px] uppercase text-white/60">Rating</p>
                   </div>
                 </div>
+              </div>
+              {/* Slide indicators */}
+              <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5 z-10">
+                {homeImages.map((_, i) => (
+                  <div
+                    key={i}
+                    className="w-1.5 h-1.5 rounded-full transition-all duration-500"
+                    style={{ background: i === currentHome ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.3)' }}
+                  />
+                ))}
               </div>
             </div>
           </motion.div>
