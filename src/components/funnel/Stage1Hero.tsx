@@ -109,9 +109,9 @@ export default function Stage1Hero({ onSubmitAddress, onContinueToAssessment }: 
                   value={address}
                   onChange={(e) => setAddress(e.target.value)}
                   placeholder="Enter your property address…"
-                  className="w-full pl-14 pr-4 py-4 rounded-lg border text-foreground text-[15px] focus:outline-none transition-all"
+                  className="w-full pl-[76px] pr-4 py-5 rounded-lg border text-foreground text-[15px] focus:outline-none transition-all"
                   style={{
-                    background: '#F8FAFC',
+                    background: '#FFFFFF',
                     borderColor: '#D8E3ED',
                     borderWidth: '1.5px',
                   }}
