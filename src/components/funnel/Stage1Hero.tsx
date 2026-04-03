@@ -35,6 +35,7 @@ export default function Stage1Hero({ onSubmitAddress, onContinueToAssessment }: 
   const [address, setAddress] = useState('');
   const [showStage2, setShowStage2] = useState(false);
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
+  const [currentHome, setCurrentHome] = useState(0);
 
   // Rotate testimonials
   useEffect(() => {
