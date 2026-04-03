@@ -190,10 +190,10 @@ export default function Stage1Hero({ onSubmitAddress, onContinueToAssessment }: 
                   key={currentHome}
                   src={homeImages[currentHome]}
                   alt="Home"
-                  initial={{ opacity: 0, scale: 1.05 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.98 }}
-                  transition={{ duration: 1.2, ease: [0.25, 0.46, 0.45, 0.94] }}
+                  initial={{ opacity: 0, scale: 1.0 }}
+                  animate={{ opacity: 1, scale: 1.08 }}
+                  exit={{ opacity: 0, scale: 1.12 }}
+                  transition={{ opacity: { duration: 1.2, ease: [0.25, 0.46, 0.45, 0.94] }, scale: { duration: 5, ease: 'linear' } }}
                   className="absolute inset-0 w-full h-full object-cover"
                 />
               </AnimatePresence>
