@@ -45,6 +45,14 @@ export default function Stage1Hero({ onSubmitAddress, onContinueToAssessment }: 
     return () => clearInterval(interval);
   }, []);
 
+  // Rotate home images
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentHome(prev => (prev + 1) % homeImages.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!address.trim()) return;
