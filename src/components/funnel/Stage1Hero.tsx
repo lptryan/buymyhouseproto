@@ -196,7 +196,6 @@ export default function Stage1Hero({ onSubmitAddress, onContinueToAssessment }: 
                   transition={{ opacity: { duration: 1.2, ease: [0.25, 0.46, 0.45, 0.94] }, scale: { duration: 5, ease: 'linear' } }}
                   className="absolute inset-0 w-full h-full object-cover"
                 />
-                />
               </AnimatePresence>
               {/* Overlay with stats */}
               <div className="absolute bottom-0 left-0 right-0 p-6 z-10" style={{ background: 'linear-gradient(to top, rgba(27,43,75,0.85) 0%, rgba(27,43,75,0.4) 60%, transparent 100%)' }}>
