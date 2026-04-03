@@ -1,9 +1,22 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MapPin, Shield, Clock, DollarSign } from 'lucide-react';
+import { Shield, Clock, DollarSign } from 'lucide-react';
 import { playButtonSound } from '@/lib/sounds';
 import heroAnimation from '@/assets/buy_my_house_animation.gif';
 import Stage2Trust from './Stage2Trust';
+
+import home1 from '@/assets/homes/home1.jpg';
+import home2 from '@/assets/homes/home2.jpg';
+import home3 from '@/assets/homes/home3.jpg';
+import home4 from '@/assets/homes/home4.jpg';
+import home5 from '@/assets/homes/home5.jpg';
+import home6 from '@/assets/homes/home6.jpg';
+import home7 from '@/assets/homes/home7.jpg';
+import home8 from '@/assets/homes/home8.jpg';
+import home9 from '@/assets/homes/home9.jpg';
+import home10 from '@/assets/homes/home10.jpg';
+
+const homeImages = [home1, home2, home3, home4, home5, home6, home7, home8, home9, home10];
 
 interface Stage1HeroProps {
   onSubmitAddress: (address: string, city: string, state: string, zip: string) => void;
