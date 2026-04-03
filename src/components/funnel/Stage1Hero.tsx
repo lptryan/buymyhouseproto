@@ -81,7 +81,7 @@ export default function Stage1Hero({ onSubmitAddress, onContinueToAssessment }: 
             {/* Address form */}
             <form onSubmit={handleSubmit} className="mb-6">
               <div className="relative">
-                <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                <img src={heroAnimation} alt="" className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 object-contain" />
                 <input
                   type="text"
                   value={address}
